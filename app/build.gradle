@@ -65,8 +65,7 @@ dependencies {
     // dagger hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
-    implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03'
-    kapt "androidx.hilt:hilt-compiler:$hilt_version"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
 
     // viewModels
     implementation 'androidx.activity:activity-ktx:1.6.0-alpha05'
