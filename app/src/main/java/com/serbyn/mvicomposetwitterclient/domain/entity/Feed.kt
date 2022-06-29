@@ -1,3 +1,3 @@
 package com.serbyn.mvicomposetwitterclient.domain.entity
 
-data class Feed(val length: Int)
+data class Feed(val tweets: List<Tweet>)

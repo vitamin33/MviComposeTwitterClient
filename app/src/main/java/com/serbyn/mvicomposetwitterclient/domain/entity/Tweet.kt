@@ -1,4 +1,3 @@
 package com.serbyn.mvicomposetwitterclient.domain.entity
 
-class Tweet {
-}
+data class Tweet(val id: String)

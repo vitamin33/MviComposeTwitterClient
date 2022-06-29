@@ -1,12 +1,16 @@
 package com.serbyn.mvicomposetwitterclient.data
 
-import com.serbyn.mvicomposetwitterclient.data.mapper.FeedResponseToFeedDomainMapper
+import android.util.Log
+import com.serbyn.mvicomposetwitterclient.data.mapper.TweetDomainToTweetBodyMapper
+import com.serbyn.mvicomposetwitterclient.data.mapper.TweetResponseToTweetDomainMapper
 import com.serbyn.mvicomposetwitterclient.data.remote.TwitterApiService
 import com.serbyn.mvicomposetwitterclient.domain.dispatchers.CoroutinesDispatchers
 import com.serbyn.mvicomposetwitterclient.domain.entity.Feed
 import com.serbyn.mvicomposetwitterclient.domain.entity.Tweet
 import com.serbyn.mvicomposetwitterclient.domain.repository.TwitterRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,21 +18,64 @@ import javax.inject.Singleton
 class TwitterRepositoryImpl @Inject constructor(
     private val dispatchers: CoroutinesDispatchers,
     private val twitterApiService: TwitterApiService,
-    private val responseToDomain: FeedResponseToFeedDomainMapper
-): TwitterRepository {
-    override fun getTwitterFeed(): Flow<Feed> {
-        TODO("Not yet implemented")
+    private val responseToDomain: TweetResponseToTweetDomainMapper,
+    private val domainToBody: TweetDomainToTweetBodyMapper
+) : TwitterRepository {
+
+    private val changesFlow =
+        MutableSharedFlow<Change>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    private sealed class Change {
+        data class Removed(val removedTweet: Tweet) : Change()
+        data class Refreshed(val feed: Feed) : Change()
+        class Posted(val postedTweet: Tweet) : Change()
+    }
+
+    private suspend fun getFeedFromRemote(): List<Tweet> {
+        return withContext(dispatchers.io) {
+            twitterApiService.getFeed().tweets.map {
+                responseToDomain.invoke(it)
+            }
+        }
+    }
+
+    override fun getTwitterFeed(): Flow<List<Tweet>> {
+        return flow {
+            val initial = getFeedFromRemote()
+            changesFlow.onEach { Log.d("ChangesFlow", "Change: $it") }
+                .scan(initial) { acc, change ->
+                    when (change) {
+                        is Change.Refreshed -> change.feed.tweets
+                        is Change.Posted -> acc + change.postedTweet
+                        is Change.Removed -> {
+                            initial.filter {
+                                it != change.removedTweet
+                            }
+                        }
+                    }
+                }
+                .onEach { Log.d("###", "[FEED_REPO] Emit feed.size=${it.size} ") }
+                .let { emitAll(it) }
+        }
     }
 
     override suspend fun refresh() {
-        TODO("Not yet implemented")
+        getFeedFromRemote().let {
+            changesFlow.emit(Change.Refreshed(Feed(it)))
+        }
     }
 
     override suspend fun removeTweet(tweet: Tweet) {
-        TODO("Not yet implemented")
+        withContext(dispatchers.io) {
+            val removed = twitterApiService.removeTweet(tweet.id)
+            changesFlow.emit(Change.Removed(responseToDomain(removed)))
+        }
     }
 
     override suspend fun postTweet(tweet: Tweet) {
-        TODO("Not yet implemented")
+        withContext(dispatchers.io) {
+            val posted = twitterApiService.postTweet(domainToBody(tweet))
+            changesFlow.emit(Change.Posted(responseToDomain(posted)))
+        }
     }
 }

@@ -4,6 +4,11 @@ import com.squareup.moshi.Json
 
 data class FeedResponse (
     @Json(name = "id")
+    val tweets: List<TweetResponse>
+)
+
+data class TweetResponse (
+    @Json(name = "id")
     val id: String,
     @Json(name = "message")
     val message: String,
@@ -11,4 +16,4 @@ data class FeedResponse (
     val name: String,
     @Json(name = "date")
     val date: String,
-    )
+)
