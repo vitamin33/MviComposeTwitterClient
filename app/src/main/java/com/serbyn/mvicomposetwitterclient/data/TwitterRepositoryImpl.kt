@@ -9,6 +9,7 @@ import com.serbyn.mvicomposetwitterclient.domain.entity.Feed
 import com.serbyn.mvicomposetwitterclient.domain.entity.Tweet
 import com.serbyn.mvicomposetwitterclient.domain.repository.TwitterRepository
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -76,6 +77,7 @@ class TwitterRepositoryImpl @Inject constructor(
         withContext(dispatchers.io) {
             val posted = twitterApiService.postTweet(domainToBody(tweet))
             changesFlow.emit(Change.Posted(responseToDomain(posted)))
+            delay(400)
         }
     }
 }
