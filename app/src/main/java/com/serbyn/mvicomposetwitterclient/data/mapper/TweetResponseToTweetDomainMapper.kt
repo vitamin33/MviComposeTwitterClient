@@ -9,6 +9,6 @@ import javax.inject.Inject
 
 class TweetResponseToTweetDomainMapper @Inject constructor() : Mapper<TweetResponse, Tweet> {
     override fun invoke(response: TweetResponse): Tweet {
-        return Tweet(response.id)
+        return Tweet(response.id, response.firstName, response.lastName, response.message, response.date)
     }
 }

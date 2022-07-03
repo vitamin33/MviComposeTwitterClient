@@ -12,8 +12,10 @@ data class TweetResponse (
     val id: String,
     @Json(name = "message")
     val message: String,
-    @Json(name = "name")
-    val name: String,
+    @Json(name = "firstName")
+    val firstName: String,
+    @Json(name = "lastName")
+    val lastName: String,
     @Json(name = "date")
     val date: String,
 )
