@@ -30,6 +30,7 @@ class FeedViewModel @Inject constructor(
             .toPartialChangeFlow()
             .sendSingleEvent()
             .scan(initViewState) { vs, change -> change.reduce(vs) }
+            .onEach { updateState { it } }
             .catch { Log.e("FeedViewModel", "Error catch during view state flow.") }
             .launchIn(viewModelScope)
     }
