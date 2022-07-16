@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -49,16 +50,37 @@ fun TweetItem(tweet: TweetItem) {
         modifier = Modifier
             .shadow(2.dp)
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data("https://cdn.icon-icons.com/icons2/2438/PNG/512/boy_avatar_icon_148455.png")
-                .crossfade(true)
-                .build(),
-            placeholder = painterResource(R.drawable.ic_baseline_person_24),
-            contentDescription = stringResource(R.string.description),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.clip(CircleShape)
-        )
+        Row (Modifier.padding(5.dp)){
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data("https://cdn.icon-icons.com/icons2/2438/PNG/512/boy_avatar_icon_148455.png")
+                    .crossfade(true)
+                    .build(),
+                placeholder = painterResource(R.drawable.ic_baseline_person_24),
+                contentDescription = stringResource(R.string.description),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape)
+            )
+            Column(Modifier.fillMaxWidth()) {
+                Row(Modifier.fillMaxWidth()) {
+                    Text(
+                        modifier = Modifier.padding(5.dp),
+                        text = tweet.fullName
+                    )
+                    Text(
+                        modifier = Modifier.padding(5.dp),
+                        text = "@${tweet.firstName}"
+                    )
+                }
+                Text(
+                    modifier = Modifier.padding(5.dp),
+                    text = tweet.message
+                )
+            }
+        }
+        Divider(color = Color.LightGray)
     }
 }
 
