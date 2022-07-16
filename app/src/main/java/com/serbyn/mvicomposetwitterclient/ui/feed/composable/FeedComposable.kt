@@ -32,9 +32,11 @@ fun FeedScreen(tweets: List<TweetItem>) {
     LazyColumn {
         items(tweets) {
             for (item in tweets) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(1.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(1.dp)
+                ) {
                     TweetItem(tweet = item)
                 }
             }
@@ -48,9 +50,12 @@ fun TweetItem(tweet: TweetItem) {
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 7.dp),
         modifier = Modifier
-            .shadow(2.dp)
+            .padding(8.dp)
     ) {
-        Row (Modifier.padding(5.dp)){
+        Row(
+            Modifier.padding(5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data("https://cdn.icon-icons.com/icons2/2438/PNG/512/boy_avatar_icon_148455.png")
@@ -63,6 +68,7 @@ fun TweetItem(tweet: TweetItem) {
                     .size(50.dp)
                     .clip(CircleShape)
             )
+            Spacer(modifier = Modifier.size(10.dp))
             Column(Modifier.fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth()) {
                     Text(
@@ -73,6 +79,20 @@ fun TweetItem(tweet: TweetItem) {
                         modifier = Modifier.padding(5.dp),
                         text = "@${tweet.firstName}"
                     )
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                top = 5.dp,
+                                bottom = 5.dp
+                            ),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(5.dp),
+                            text = tweet.date
+                        )
+                    }
                 }
                 Text(
                     modifier = Modifier.padding(5.dp),
