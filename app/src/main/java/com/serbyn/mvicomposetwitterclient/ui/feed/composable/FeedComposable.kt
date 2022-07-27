@@ -20,17 +20,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.serbyn.mvicomposetwitterclient.R
+import com.serbyn.mvicomposetwitterclient.ui.feed.FeedViewModel
 import com.serbyn.mvicomposetwitterclient.ui.feed.entity.TweetItem
 import com.serbyn.mvicomposetwitterclient.ui.theme.MviComposeTwitterClientTheme
 import com.serbyn.mvicomposetwitterclient.ui.theme.Purple700
+import com.serbyn.mvicomposetwitterclient.ui.tweet.AddTweetViewModel
 
 @Composable
 fun FeedScreen(navController: NavController, tweets: List<TweetItem> = testFeedItems) {
+    val viewModel = hiltViewModel<FeedViewModel>()
+
     LazyColumn {
         items(tweets) {
             for (item in tweets) {
