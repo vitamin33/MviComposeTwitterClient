@@ -1,6 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.serbyn.mvicomposetwitterclient.ui.feed.composable
+package com.serbyn.mvicomposetwitterclient.ui.tweet.composable
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -25,25 +24,14 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.serbyn.mvicomposetwitterclient.R
+import com.serbyn.mvicomposetwitterclient.domain.entity.Tweet
 import com.serbyn.mvicomposetwitterclient.ui.feed.entity.TweetItem
 import com.serbyn.mvicomposetwitterclient.ui.theme.MviComposeTwitterClientTheme
 import com.serbyn.mvicomposetwitterclient.ui.theme.Purple700
 
 @Composable
-fun FeedScreen(navController: NavController, tweets: List<TweetItem> = testFeedItems) {
-    LazyColumn {
-        items(tweets) {
-            for (item in tweets) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(1.dp)
-                ) {
-                    TweetItem(tweet = item)
-                }
-            }
-        }
-    }
+fun AddTweetScreen(navController: NavController, item: TweetItem = testItem) {
+    TweetItem(item)
 }
 
 @Composable
@@ -120,22 +108,19 @@ fun ErrorScreen(error: String) {
     }
 }
 
-val testFeedItems = listOf(
-    TweetItem(
-        "1",
-        "Jack",
-        "Walton",
-        "All is good! All is good! All is good! All is good! All is good!",
-        "11-10-2022"
-    ),
-    TweetItem("1", "Jack", "Walton", "All is good! All is good! All is good! All is good! All is good! All is good! All is good!", "11-10-2022"),
-    TweetItem("1", "Jack", "Walton", "All is good!", "11-10-2022")
+val testItem = TweetItem(
+    "1",
+    "Jack",
+    "Walton",
+    "All is good! All is good! All is good! All is good! All is good! All is good! All is good!",
+    "11-10-2022"
 )
+
 
 @Preview(showBackground = true)
 @Composable
-fun FeedScreenPreview() {
+fun AddTweetScreenPreview() {
     MviComposeTwitterClientTheme {
-        FeedScreen(rememberNavController())
+        AddTweetScreen(rememberNavController(), testItem)
     }
 }

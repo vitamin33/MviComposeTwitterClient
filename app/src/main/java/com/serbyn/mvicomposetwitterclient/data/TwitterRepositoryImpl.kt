@@ -8,7 +8,6 @@ import com.serbyn.mvicomposetwitterclient.domain.dispatchers.CoroutinesDispatche
 import com.serbyn.mvicomposetwitterclient.domain.entity.Feed
 import com.serbyn.mvicomposetwitterclient.domain.entity.Tweet
 import com.serbyn.mvicomposetwitterclient.domain.repository.TwitterRepository
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
@@ -24,7 +23,7 @@ class TwitterRepositoryImpl @Inject constructor(
 ) : TwitterRepository {
 
     private val changesFlow =
-        MutableSharedFlow<Change>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+        MutableSharedFlow<Change>()
 
     private sealed class Change {
         data class Removed(val removedTweet: Tweet) : Change()
