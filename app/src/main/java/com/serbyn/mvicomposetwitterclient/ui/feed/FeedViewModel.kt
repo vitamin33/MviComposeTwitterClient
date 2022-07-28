@@ -35,9 +35,7 @@ class FeedViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    override fun getInitialState(): ViewState {
-        return ViewState.initial()
-    }
+    override fun initialState(): ViewState = ViewState.initial()
 
     fun Flow<PartialChange>.sendSingleEvent(): Flow<PartialChange> {
         return onEach {

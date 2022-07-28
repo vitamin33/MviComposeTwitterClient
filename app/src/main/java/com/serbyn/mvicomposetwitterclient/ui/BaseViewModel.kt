@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.*
 abstract class BaseViewModel<S , I> : ViewModel() {
 
     private val intentFlow: SharedFlow<I> = MutableSharedFlow()
-    private val _state: MutableStateFlow<S> by lazy { MutableStateFlow(initialState) }
+    private val _state: MutableStateFlow<S> by lazy { MutableStateFlow(initialState()) }
     val stateFlow: StateFlow<S> = _state
 
-    abstract val initialState: S
+    abstract fun initialState() : S
 
     init { observeIntents() }
 
@@ -19,6 +19,6 @@ abstract class BaseViewModel<S , I> : ViewModel() {
     }
 
     protected suspend fun updateState(handler: suspend (oldState: S) -> S) {
-        _state.emit(handler(_state.value ?: initialState))
+        _state.emit(handler(_state.value ?: initialState()))
     }
 }

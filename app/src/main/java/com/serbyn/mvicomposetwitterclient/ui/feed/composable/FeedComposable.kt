@@ -36,9 +36,11 @@ import com.serbyn.mvicomposetwitterclient.ui.theme.Purple700
 import com.serbyn.mvicomposetwitterclient.ui.tweet.AddTweetViewModel
 
 @Composable
-fun FeedScreen(navController: NavController, tweets: List<TweetItem> = testFeedItems) {
-    val viewModel = hiltViewModel<FeedViewModel>()
-
+fun FeedScreen(
+    navController: NavController,
+    tweets: List<TweetItem> = testFeedItems,
+    viewModel: FeedViewModel = hiltViewModel(),
+) {
     FeedContent(tweets = tweets)
 }
 

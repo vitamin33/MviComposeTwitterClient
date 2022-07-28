@@ -3,6 +3,7 @@ package com.serbyn.mvicomposetwitterclient.ui.tweet
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.serbyn.mvicomposetwitterclient.domain.usecase.GetFeedUseCase
+import com.serbyn.mvicomposetwitterclient.domain.usecase.PostTweetUseCase
 import com.serbyn.mvicomposetwitterclient.domain.usecase.RefreshFeedUseCase
 import com.serbyn.mvicomposetwitterclient.domain.usecase.RemoveTweetUseCase
 import com.serbyn.mvicomposetwitterclient.ui.BaseViewModel
@@ -13,26 +14,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddTweetViewModel @Inject constructor(
-    private val getFeedUseCase: GetFeedUseCase,
-    private val refreshFeedUseCase: RefreshFeedUseCase,
-    private val removeTweetUseCase: RemoveTweetUseCase
+    private val addTweetUseCase: PostTweetUseCase
 ) : BaseViewModel<ViewState, ViewIntent>(){
 
     init {
-        val initViewState = ViewState.initial()
         val intentFlow = observeIntents()
         merge(
             intentFlow.filterIsInstance<ViewIntent>().take(1),
             intentFlow.filterNot { it is ViewIntent.Initial }
         )
             .onEach { updateState { it } }
-            .catch { Log.e("FeedViewModel", "Error catch during view state flow.") }
+            .catch { Log.e("AddTweetViewModel", "Error catch during view state flow.") }
             .launchIn(viewModelScope)
     }
 
-    override fun getInitialState(): ViewState {
-        return ViewState.initial()
-    }
+    override fun initialState(): ViewState = ViewState.initial()
 
     fun processIntents(intent: ViewIntent) {
         when(intent) {
@@ -52,6 +48,6 @@ class AddTweetViewModel @Inject constructor(
     }
 
     private fun <T : ViewIntent> Flow<T>.logIntent() = onEach {
-        Log.d("FeedViewModel", "## Intent: $it")
+        Log.d("AddTweetViewModel", "## Intent: $it")
     }
 }

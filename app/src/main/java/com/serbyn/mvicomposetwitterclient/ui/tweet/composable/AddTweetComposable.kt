@@ -29,8 +29,11 @@ import com.serbyn.mvicomposetwitterclient.ui.theme.Purple700
 import com.serbyn.mvicomposetwitterclient.ui.tweet.AddTweetViewModel
 
 @Composable
-fun AddTweetScreen(navController: NavController, item: TweetItem = testItem) {
-    val viewModel = hiltViewModel<AddTweetViewModel>()
+fun AddTweetScreen(
+    navController: NavController,
+    item: TweetItem = testItem,
+    viewModel: AddTweetViewModel = hiltViewModel(),
+) {
     TweetItem(item)
 }
 
