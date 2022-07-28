@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -36,19 +39,38 @@ import com.serbyn.mvicomposetwitterclient.ui.tweet.AddTweetViewModel
 fun FeedScreen(navController: NavController, tweets: List<TweetItem> = testFeedItems) {
     val viewModel = hiltViewModel<FeedViewModel>()
 
-    LazyColumn {
-        items(tweets) {
-            for (item in tweets) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(1.dp)
-                ) {
-                    TweetItem(tweet = item)
+    FeedContent(tweets = tweets)
+}
+
+@Composable
+fun FeedContent(tweets: List<TweetItem>) {
+    Scaffold(
+        topBar = { },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                //TODO add on click implementation
+            }) {
+                Icon(Icons.Filled.Add, "")
+            }
+        },
+        content = {
+            Surface(modifier = Modifier.padding(24.dp)) {
+                LazyColumn {
+                    items(tweets) {
+                        for (item in tweets) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(1.dp)
+                            ) {
+                                TweetItem(tweet = item)
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
+    )
 }
 
 @Composable
@@ -133,7 +155,13 @@ val testFeedItems = listOf(
         "All is good! All is good! All is good! All is good! All is good!",
         "11-10-2022"
     ),
-    TweetItem("1", "Jack", "Walton", "All is good! All is good! All is good! All is good! All is good! All is good! All is good!", "11-10-2022"),
+    TweetItem(
+        "1",
+        "Jack",
+        "Walton",
+        "All is good! All is good! All is good! All is good! All is good! All is good! All is good!",
+        "11-10-2022"
+    ),
     TweetItem("1", "Jack", "Walton", "All is good!", "11-10-2022")
 )
 
