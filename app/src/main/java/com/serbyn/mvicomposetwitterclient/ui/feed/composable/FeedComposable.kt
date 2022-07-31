@@ -56,7 +56,7 @@ fun FeedScreen(
         }
         FeedContract.FeedState.Loading -> LoadingScreen()
         FeedContract.FeedState.Error -> ErrorScreen(error = "Error while loading feed screen!")
-        FeedContract.FeedState.Idle -> TODO()
+        FeedContract.FeedState.Idle -> EmptyScreen()
     }
 }
 
@@ -172,24 +172,6 @@ fun EmptyScreen() {
         Text(text = "No items found!")
     }
 }
-
-val testFeedItems = listOf(
-    TweetItem(
-        "1",
-        "Jack",
-        "Walton",
-        "All is good! All is good! All is good! All is good! All is good!",
-        "11-10-2022"
-    ),
-    TweetItem(
-        "1",
-        "Jack",
-        "Walton",
-        "All is good! All is good! All is good! All is good! All is good! All is good! All is good!",
-        "11-10-2022"
-    ),
-    TweetItem("1", "Jack", "Walton", "All is good!", "11-10-2022")
-)
 
 @Preview(showBackground = true)
 @Composable

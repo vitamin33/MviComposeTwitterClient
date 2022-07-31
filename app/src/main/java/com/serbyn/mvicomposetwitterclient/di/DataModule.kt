@@ -1,6 +1,7 @@
 package com.serbyn.mvicomposetwitterclient.di
 
 import com.serbyn.mvicomposetwitterclient.BuildConfig
+import com.serbyn.mvicomposetwitterclient.data.remote.MockTwitterApiServiceImpl
 import com.serbyn.mvicomposetwitterclient.data.remote.TwitterApiService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -23,8 +24,11 @@ annotation class BaseUrl
 @InstallIn(SingletonComponent::class)
 class DataModule {
 
+//    @Provides
+//    fun provideTwitterApiService(retrofit: Retrofit): TwitterApiService = TwitterApiService(retrofit)
+
     @Provides
-    fun provideTwitterApiService(retrofit: Retrofit): TwitterApiService = TwitterApiService(retrofit)
+    fun provideTwitterApiService(retrofit: Retrofit): TwitterApiService = MockTwitterApiServiceImpl()
 
     @Provides
     fun provideMoshi(): Moshi {
