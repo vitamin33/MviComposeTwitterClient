@@ -1,24 +1,63 @@
 package com.serbyn.mvicomposetwitterclient.ui
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.channels.BufferOverflow
+import androidx.lifecycle.viewModelScope
+import com.serbyn.mvicomposetwitterclient.ui.base.UiEffect
+import com.serbyn.mvicomposetwitterclient.ui.base.UiEvent
+import com.serbyn.mvicomposetwitterclient.ui.base.UiState
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<S , I> : ViewModel() {
+abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect> : ViewModel() {
 
-    private val intentFlow: SharedFlow<I> = MutableSharedFlow()
-    private val _state: MutableStateFlow<S> by lazy { MutableStateFlow(initialState()) }
-    val stateFlow: StateFlow<S> = _state
+    // Create Initial State of View
+    private val initialState : State by lazy { initialState() }
 
-    abstract fun initialState() : S
+    // Get Current State
+    val currentState: State
+        get() = uiState.value
 
-    init { observeIntents() }
+    private val _uiState : MutableStateFlow<State> = MutableStateFlow(initialState)
+    val uiState = _uiState.asStateFlow()
 
-    fun observeIntents(): Flow<I> {
-        return intentFlow
+    private val _events : MutableSharedFlow<Event> = MutableSharedFlow()
+    val events = _events.asSharedFlow()
+
+    private val _effects : Channel<Effect> = Channel()
+    val effects = _effects.receiveAsFlow()
+
+    init {
+        subscribeEvents()
     }
 
-    protected suspend fun updateState(handler: suspend (oldState: S) -> S) {
-        _state.emit(handler(_state.value ?: initialState()))
+    abstract fun initialState() : State
+
+    abstract fun handleEvent(event: Event)
+
+    private fun subscribeEvents() {
+        viewModelScope.launch {
+            events.collect {
+                handleEvent(it)
+            }
+        }
+    }
+
+    fun emitEvent(e: Event) {
+        viewModelScope.launch {
+            _events.emit(e)
+        }
+    }
+
+    protected fun setState(reduce: State.() -> State) {
+        val newState = currentState.reduce()
+        _uiState.value = newState
+    }
+
+    protected fun sendEffect(builder: () -> Effect) {
+        val effectValue = builder()
+        viewModelScope.launch {
+            _effects.send(effectValue)
+        }
     }
 }

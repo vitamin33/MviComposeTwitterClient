@@ -11,6 +11,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,19 +21,25 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.serbyn.mvicomposetwitterclient.R
+import com.serbyn.mvicomposetwitterclient.ui.collectAsStateLifecycleAware
+import com.serbyn.mvicomposetwitterclient.ui.feed.FeedContract
 import com.serbyn.mvicomposetwitterclient.ui.feed.FeedViewModel
 import com.serbyn.mvicomposetwitterclient.ui.feed.entity.TweetItem
+import com.serbyn.mvicomposetwitterclient.ui.rememberFlow
 import com.serbyn.mvicomposetwitterclient.ui.theme.MviComposeTwitterClientTheme
 import com.serbyn.mvicomposetwitterclient.ui.theme.Purple700
 import com.serbyn.mvicomposetwitterclient.ui.tweet.AddTweetViewModel
@@ -38,20 +47,28 @@ import com.serbyn.mvicomposetwitterclient.ui.tweet.AddTweetViewModel
 @Composable
 fun FeedScreen(
     navController: NavController,
-    tweets: List<TweetItem> = testFeedItems,
     viewModel: FeedViewModel = hiltViewModel(),
 ) {
-    FeedContent(tweets = tweets)
+    val state: FeedContract.State by viewModel.uiState.collectAsStateLifecycleAware()
+    when(val feedState = state.feedState) {
+        is FeedContract.FeedState.Success -> {
+            FeedContent(navController, tweets = feedState.feedItems)
+        }
+        FeedContract.FeedState.Loading -> LoadingScreen()
+        FeedContract.FeedState.Error -> ErrorScreen(error = "Error while loading feed screen!")
+        FeedContract.FeedState.Idle -> TODO()
+    }
 }
 
 @Composable
-fun FeedContent(tweets: List<TweetItem>) {
+fun FeedContent(navController: NavController, tweets: List<TweetItem>) {
     Scaffold(
         topBar = { },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                //TODO add on click implementation
-            }) {
+            FloatingActionButton(
+                shape = CircleShape,
+                contentColor = Color.DarkGray,
+                onClick = { navController.navigate("addTweet") }) {
                 Icon(Icons.Filled.Add, "")
             }
         },
@@ -146,6 +163,13 @@ fun LoadingScreen() {
 fun ErrorScreen(error: String) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         Text(text = "Oops, $error!")
+    }
+}
+
+@Composable
+fun EmptyScreen() {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        Text(text = "No items found!")
     }
 }
 
