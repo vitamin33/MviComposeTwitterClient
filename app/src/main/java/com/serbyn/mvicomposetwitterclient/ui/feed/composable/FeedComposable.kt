@@ -73,7 +73,7 @@ fun FeedContent(navController: NavController, tweets: List<TweetItem>) {
             }
         },
         content = {
-            Surface(modifier = Modifier.padding(24.dp)) {
+            Surface(modifier = Modifier.padding(12.dp)) {
                 LazyColumn {
                     items(tweets) {
                         for (item in tweets) {
@@ -137,7 +137,8 @@ fun TweetItem(tweet: TweetItem) {
                         contentAlignment = Alignment.CenterEnd
                     ) {
                         Text(
-                            modifier = Modifier.padding(5.dp),
+                            color = Color.DarkGray,
+                            fontSize = 12.sp,
                             text = tweet.date
                         )
                     }

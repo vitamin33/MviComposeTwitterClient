@@ -43,7 +43,7 @@ abstract class BaseViewModel<Event : UiEvent, State : UiState, Effect : UiEffect
         }
     }
 
-    fun emitEvent(e: Event) {
+    fun sendEvent(e: Event) {
         viewModelScope.launch {
             _events.emit(e)
         }

@@ -20,6 +20,10 @@ class FeedViewModel @Inject constructor(
     private val removeTweetUseCase: RemoveTweetUseCase
 ) : BaseViewModel<Event, State, Effect>() {
 
+    init {
+        sendEvent(Event.Initial)
+    }
+
     override fun initialState(): State {
         return State(FeedState.Idle)
     }
@@ -40,10 +44,12 @@ class FeedViewModel @Inject constructor(
                 .onStart { setState { copy(feedState = FeedState.Loading) } }
                 .onEach {
                     Log.d("FeedViewModel", "Emit feed.size=${it.size}")
+                }
+                .catch { setState { copy(feedState = FeedState.Error) } }
+                .collect {
                     val items = it.map(::TweetItem)
                     setState { copy(feedState = FeedState.Success(items)) }
                 }
-                .catch { setState { copy(feedState = FeedState.Error) } }
         }
     }
 

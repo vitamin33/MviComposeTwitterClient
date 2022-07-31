@@ -41,21 +41,7 @@ class TwitterRepositoryImpl @Inject constructor(
 
     override fun getTwitterFeed(): Flow<List<Tweet>> {
         return flow {
-            val initial = getFeedFromRemote()
-            changesFlow.onEach { Log.d("ChangesFlow", "Change: $it") }
-                .scan(initial) { acc, change ->
-                    when (change) {
-                        is Change.Refreshed -> change.feed.tweets
-                        is Change.Posted -> acc + change.postedTweet
-                        is Change.Removed -> {
-                            initial.filter {
-                                it != change.removedTweet
-                            }
-                        }
-                    }
-                }
-                .onEach { Log.d("###", "[FEED_REPO] Emit feed.size=${it.size} ") }
-                .let { emitAll(it) }
+            emit(getFeedFromRemote())
         }
     }
 
