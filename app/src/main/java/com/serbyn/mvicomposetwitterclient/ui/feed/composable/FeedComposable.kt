@@ -2,6 +2,8 @@
 
 package com.serbyn.mvicomposetwitterclient.ui.feed.composable
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,26 +12,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -42,17 +37,55 @@ import com.serbyn.mvicomposetwitterclient.ui.feed.entity.TweetItem
 import com.serbyn.mvicomposetwitterclient.ui.rememberFlow
 import com.serbyn.mvicomposetwitterclient.ui.theme.MviComposeTwitterClientTheme
 import com.serbyn.mvicomposetwitterclient.ui.theme.Purple700
-import com.serbyn.mvicomposetwitterclient.ui.tweet.AddTweetViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun FeedScreen(
     navController: NavController,
     viewModel: FeedViewModel = hiltViewModel(),
 ) {
+    Scaffold(
+        topBar = { },
+        floatingActionButton = {
+            FloatingActionButton(
+                shape = CircleShape,
+                contentColor = Color.DarkGray,
+                onClick = {
+                    viewModel.sendEvent(FeedContract.Event.NavigateToAddTweet)
+                }) {
+                Icon(Icons.Filled.Add, "")
+            }
+        },
+        content = {
+            Content(navController, viewModel)
+        }
+    )
+}
+
+@Composable
+fun Content(
+    navController: NavController,
+    viewModel: FeedViewModel
+) {
+    val scope = rememberCoroutineScope()
+    val effectsFlow = rememberFlow(viewModel.effects)
+    val snackBarHostState = remember { SnackbarHostState() }
+    scope.launch {
+        effectsFlow.collect { effect ->
+            when (effect) {
+                is FeedContract.Effect.ShowToast -> showSnackBar(
+                    effect.message,
+                    snackBarHostState
+                )
+                FeedContract.Effect.AddTweetNavigated -> navController.navigate("addTweet")
+            }
+        }
+    }
+
     val state: FeedContract.State by viewModel.uiState.collectAsStateLifecycleAware()
-    when(val feedState = state.feedState) {
+    when (val feedState = state.feedState) {
         is FeedContract.FeedState.Success -> {
-            FeedContent(navController, tweets = feedState.feedItems)
+            FeedContent(feedState.feedItems)
         }
         FeedContract.FeedState.Loading -> LoadingScreen()
         FeedContract.FeedState.Error -> ErrorScreen(error = "Error while loading feed screen!")
@@ -60,36 +93,29 @@ fun FeedScreen(
     }
 }
 
+suspend fun showSnackBar(message: String, snackBarHostState: SnackbarHostState) {
+    snackBarHostState.showSnackbar(
+        message = message
+    )
+}
+
 @Composable
-fun FeedContent(navController: NavController, tweets: List<TweetItem>) {
-    Scaffold(
-        topBar = { },
-        floatingActionButton = {
-            FloatingActionButton(
-                shape = CircleShape,
-                contentColor = Color.DarkGray,
-                onClick = { navController.navigate("addTweet") }) {
-                Icon(Icons.Filled.Add, "")
-            }
-        },
-        content = {
-            Surface(modifier = Modifier.padding(12.dp)) {
-                LazyColumn {
-                    items(tweets) {
-                        for (item in tweets) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(1.dp)
-                            ) {
-                                TweetItem(tweet = item)
-                            }
-                        }
+fun FeedContent(tweets: List<TweetItem>) {
+    Surface(modifier = Modifier.padding(12.dp)) {
+        LazyColumn {
+            items(tweets) {
+                for (item in tweets) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(1.dp)
+                    ) {
+                        TweetItem(tweet = item)
                     }
                 }
             }
         }
-    )
+    }
 }
 
 @Composable
@@ -180,4 +206,8 @@ fun FeedScreenPreview() {
     MviComposeTwitterClientTheme {
         FeedScreen(rememberNavController())
     }
+}
+
+private fun showToastMessage(context: Context, message: String) {
+    Toast.makeText(context, "Clicked!!!!", Toast.LENGTH_SHORT).show()
 }

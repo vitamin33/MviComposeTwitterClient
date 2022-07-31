@@ -9,6 +9,7 @@ import com.serbyn.mvicomposetwitterclient.ui.feed.entity.TweetItem
 interface FeedContract {
     sealed class Event : UiEvent {
         object Initial : Event()
+        object NavigateToAddTweet : Event()
         data class Remove(val tweet: TweetItem) : Event()
     }
 
@@ -25,6 +26,7 @@ interface FeedContract {
     }
 
     sealed class Effect : UiEffect {
-        object ShowToast : Effect()
+        data class ShowToast(val message: String) : Effect()
+        object AddTweetNavigated : Effect()
     }
 }

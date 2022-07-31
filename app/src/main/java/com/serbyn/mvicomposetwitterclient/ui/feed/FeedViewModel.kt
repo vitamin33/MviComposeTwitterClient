@@ -28,13 +28,15 @@ class FeedViewModel @Inject constructor(
         return State(FeedState.Idle)
     }
 
-
     override fun handleEvent(event: Event) {
         when (event) {
             Event.Initial -> {
                 loadFeed()
             }
             is Event.Remove -> TODO()
+            Event.NavigateToAddTweet -> sendEffect {
+                Effect.AddTweetNavigated
+            }
         }
     }
 
